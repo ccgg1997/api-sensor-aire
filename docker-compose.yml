@@ -1,0 +1,71 @@
+version: '3.9'
+services:
+
+  database:
+    image: postgres:latest
+    container_name: air_quality_db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: air_quality
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - database
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: air_quality_backend
+    environment:
+      DATABASE_URL: postgres://user:password@database:5432/air_quality
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - database
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: air_quality_frontend
+    environment:
+      TELEGRAM_BOT_TOKEN: your_telegram_bot_token
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./frontend:/app
+  ollama:
+    build:
+      context: ./ollama
+    #   dockerfile: Dockerfile
+    volumes:
+      - ./ollama/ollama:/root/.ollama
+    container_name: ollama
+    pull_policy: always
+    tty: true
+    restart: unless-stopped
+    image: ollama/ollama:latest
+    ports:
+      - 7869:11434
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
