@@ -1,6 +1,5 @@
 version: '3.9'
 services:
-
   database:
     image: postgres:latest
     container_name: air_quality_db
@@ -12,6 +11,8 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - air_quality_network
 
   pgadmin:
     image: dpage/pgadmin4
@@ -23,6 +24,8 @@ services:
       - "5050:80"
     depends_on:
       - database
+    networks:
+      - air_quality_network
 
   backend:
     build:
@@ -37,6 +40,8 @@ services:
       - ./backend:/app
     depends_on:
       - database
+    networks:
+      - air_quality_network
 
   frontend:
     build:
@@ -49,10 +54,12 @@ services:
       - "8501:8501"
     volumes:
       - ./frontend:/app
+    networks:
+      - air_quality_network
+
   ollama:
     build:
       context: ./ollama
-    #   dockerfile: Dockerfile
     volumes:
       - ./ollama/ollama:/root/.ollama
     container_name: ollama
@@ -61,11 +68,16 @@ services:
     restart: unless-stopped
     image: ollama/ollama:latest
     ports:
-      - 7869:11434
+      - "7869:11434"
     environment:
       - OLLAMA_KEEP_ALIVE=24h
     depends_on:
       - backend
+    networks:
+      - air_quality_network
+
+networks:
+  air_quality_network: {}
 
 volumes:
   postgres_data:

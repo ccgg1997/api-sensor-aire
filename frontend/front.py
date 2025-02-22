@@ -3,7 +3,8 @@ import streamlit as st
 import requests
 
 # URL del endpoint del backend
-API_URL = "http://ollama:7869/api/chat"
+API_URL = "http://ollama:11434/api/chat"
+# API_URL = "http://ollama:11434"
 
 def main():
     # Configura la página (opcional)
@@ -25,23 +26,26 @@ def main():
                 "stream": False
             }
 
-            # Enviamos la solicitud POST al backend
-            response = requests.post(API_URL, json=data, timeout=100)
-            # response.raise_for_status()  # Lanza excepción si el estatus no es 200-299
+    
+            # response = requests.get(API_URL)
+            
+            response = requests.post(API_URL, json = data, timeout=10000)
+            mensaje = response.text
 
-            # Asumimos que el backend responde con JSON
-            mensaje = response.json()
-
-            # Muestra el resultado en Streamlit
-            mensaje = "Hola, soy un mensaje del Backend"
+            # mensaje = "Hola, soy un mensaje del Backend"
             st.success(f"Mensaje del Backend: {mensaje}")
 
-        except requests.exceptions.ConnectionError:
-            st.error("No se pudo conectar con el backend. Verifica que el servidor esté funcionando.")
+        except Exception as e:
+            st.error("No se pudo conectar con el backend. Verifica que el servidor esté funcionando." +str(e))
         except requests.exceptions.Timeout:
             st.error("La solicitud excedió el tiempo de espera.")
         except requests.exceptions.RequestException as e:
             st.error(f"Error inesperado al conectarse al Backend: {e}")
+
+# def main():
+#     API_URL = "http://localhost:7869"
+#     response = requests.get(API_URL)
+#     print(response.text)
 
 if __name__ == "__main__":
     main()

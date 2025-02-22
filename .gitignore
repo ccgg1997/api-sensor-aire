@@ -1,3 +1,6 @@
 ./ollama/ollama
 ollama/ollama/*
 
+env/*
+venv/*
+./env/*
