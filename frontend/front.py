@@ -3,15 +3,18 @@ import streamlit as st
 import requests
 
 # URL del endpoint del backend
-API_URL = "http://ollama:11434/api/chat"
+# API_URL = "http://ollama:11434/api/chat"
+API_URL = "http://nuevo_contenedor:11434/api/chat"
 # API_URL = "http://ollama:11434"
 
 def main():
-    # Configura la página (opcional)
-    st.set_page_config(page_title="Frontend: Consumiendo API Flask", layout="centered")
+    st.set_page_config(page_title="Frontend: TU ASISTENTE PERSONAL", layout="centered")
     
-    st.title("Frontend: Consumiendo API Flask")
-    st.write("Presiona el botón para obtener el mensaje del backend:")
+    st.title("Frontend: Respondiendo preguntas sobre la calidad del aire")
+    pregunta = st.text_area("Escribe tu pregunta aquí:", height=100)
+    st.write("Presiona el botón para obtener una respuesta.")
+    
+    pregunta = f"Eres un experto en sensores de calidad del aire, tu nombre DeepFahrenheit y eres un asistente sobre el monitoreo en tiempo real de la calidad del aire (proximamente disponible). por ahora solo puedes responder preguntas generales sobre calidad del aire y sensores. Si te preguntan algo diferente, responde no respondas y solo escribe MI ESPECIALIDAD SON LOS SENSORES. Si te saludan, saluda y di quien eres. Esta es la pregunta: {pregunta}"
     
     if st.button("Obtener Mensaje"):
         try:
@@ -20,7 +23,7 @@ def main():
                 "messages": [
                     {
                         "role": "user",
-                        "content": "¿Cómo estás?"
+                        "content": pregunta
                     }
                 ],
                 "stream": False
@@ -32,7 +35,6 @@ def main():
             response = requests.post(API_URL, json = data, timeout=10000)
             mensaje = response.text
 
-            # mensaje = "Hola, soy un mensaje del Backend"
             st.success(f"Mensaje del Backend: {mensaje}")
 
         except Exception as e:
